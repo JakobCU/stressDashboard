@@ -9,22 +9,49 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+```{r packages}
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+install.packages("shiny")
+install.packages("tidyverse")
+install.packages("shinydashboard")
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+library(shiny)
+library(tidyverse)
+library(shinydashboard)
 
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+```{r}
 
-You can also embed plots, for example:
+ui <- dashboardPage(
+  dashboardHeader(title = "Testseite"),
+  dashboardSidebar(),
+  dashboardBody(
+    box(plotOutput("correlation_plot"), width = 6),
+    box(plotOutput("correlation_plot_2"), width = 6),
+    infoBox(
+      "Approval Rating", "60%", icon = icon("line-chart"), color = "green",
+      fill = TRUE
+    ),valueBox(
+      uiOutput("orderNum"), "New Orders", icon = icon("credit-card"),
+      href = "http://google.com"
+    ),
+    fluidRow(
+    box(status = "primary",
+      sliderInput("orders", "Orders", min = 1, max = 2000, value = 650),
+      selectInput("progress", "Progress",
+        choices = c("0%" = 0, "20%" = 20, "40%" = 40, "60%" = 60, "80%" = 80,
+                    "100%" = 100)
+      )
+    ),
+  )
+))
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+server <- function(input, output) {
+  output$correlation_plot <- renderPlot({ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width))+ geom_point()})
+  output$correlation_plot_2 <- renderPlot({ggplot(iris, aes(x=Sepal.Length, y=Petal.Length, colour = Species))+ geom_point()})
+}
+
+shinyApp(ui, server)
+
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
