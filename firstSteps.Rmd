@@ -21,7 +21,7 @@ library(shinydashboard)
 
 ```
 
-```{r}
+```{r dashboard elements try out}
 
 ui <- dashboardPage(
   dashboardHeader(title = "Testseite"),
@@ -53,5 +53,27 @@ server <- function(input, output) {
 }
 
 shinyApp(ui, server)
+
+```
+
+```{r data Affektiva}
+
+faceReaderSample <- read.csv(file = "ExportMerge.csv")
+
+
+
+faceReaderSample_short <- faceReaderSample[-c(1:25,206:209),]
+names(faceReaderSample_short) <- (faceReaderSample[23,])
+faceReaderSample_short$EventSource = NULL
+
+ggplot(data = faceReaderSample_short, aes(x = Timestamp, y = Joy, color = Respondent)) +
+  geom_point(size = 0.1) + geom_smooth(aes(group = factor(Respondent)), size =1.5, alpha = 0.2, level = 0.95, formula = y ~ poly(x,10), method = "lm", se = F) + 
+  theme_minimal() + 
+  theme(axis.text.y.left =  element_blank()) +
+  theme(axis.text.x =  element_blank())+
+  ylab(label = "Joy") 
+
+
+plot(faceReaderSample_short$Timestamp, faceReaderSample_short$Joy)
 
 ```
